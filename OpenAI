@@ -1,0 +1,28 @@
+import os
+import openai
+import chronological
+
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
+# Load your API key from an environment variable or secret management service
+
+
+response = openai.Completion.create(engine="davinci", prompt="This is a test", max_tokens=5)
+
+
+# you can name this function anything you want, the name "logic" is arbitrary
+async def logic():
+    # you call the Chronology functions, awaiting the ones that are marked await
+    prompt = chronological.read_prompt('example_prompt')
+    completion = await chronological.cleaned_completion(prompt, max_tokens=10, engine="davinci", temperature=0.5, top_p=1,
+                                          frequency_penalty=0.2, stop=["\n\n"])
+
+    print('Completion Response: {0}'.format(completion))
+
+    # you can also run whatever you want in this function
+    for i in range(4):
+        print("hello")
+
+
+# invoke the Chronology main fn to run the async logic
+chronological.main(logic)

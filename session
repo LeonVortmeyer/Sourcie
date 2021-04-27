@@ -1,0 +1,29 @@
+from Helpers.capterra_helper import *
+from Helpers.storage_helper import *
+import os
+
+pw = os.environ['pw']
+connection = create_db_connection("localhost", "root", pw, "source")
+
+
+urls = find_capterra_categories()
+
+for url in urls:
+    sources = crawl_capterra(url)
+
+    for item in sources:
+        pop_source = (
+        """
+        INSERT INTO source(name, type, url, description, countries, employees, capterra_review_count, capterra_review_rating,
+         pricing_options, user_count, logo_filepath) VALUES
+        ('""" + str(getattr(item, "_capterra_name")).replace("'", "''") + """' , '""" + str(getattr(item, "_capterra_type")) + """', 
+        '""" + str(getattr(item, "_capterra_url")) + """', '""" + str(getattr(item, "_capterra_description")).replace("'", "''") + """', '""" + str(getattr(item, "_capterra_countries"))
+        + """', """ + str(getattr(item, "_capterra_employees")) + """, """ + str(getattr(item, "_capterra_reviews"))
+        + """, """ + str(getattr(item, "_capterra_review_rating")) + """, """ + str(getattr(item, "_capterra_pricing_options"))
+        + """, """ + str(getattr(item, "_capterra_users")) + """, '""" + str(getattr(item, "_capterra_logo_filepath")) + """');
+        """
+                      )
+        print(pop_source)
+        execute_query(connection, pop_source)
+
+
